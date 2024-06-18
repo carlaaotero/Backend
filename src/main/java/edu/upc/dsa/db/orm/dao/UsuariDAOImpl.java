@@ -9,22 +9,27 @@ import java.util.List;
 
 public class UsuariDAOImpl implements UsuariDAO {
 
-    public int addUsuari(String nom, String cognom, String nomusuari, String password, String password2, int coins) {
+
+    private static UsuariDAO instance;
+
+    public static UsuariDAO getInstance() {
+        if (instance == null) instance = new UsuariDAOImpl();
+        return instance;
+    }
+
+
+
+    public void addUsuari(String nom, String cognom, String nomusuari, String password, String password2, int coins) {
         Sessio session = null;
-        int usuariID = 0;
         try {
             session = FactorySession.openSession();
             Usuari usuari = new Usuari(nom, cognom, nomusuari, password, password2, coins);
             session.save(usuari);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // LOG
-        }
-        finally {
+        } finally {
             session.close();
         }
-
-        return usuariID;
     }
 
 
@@ -34,18 +39,16 @@ public class UsuariDAOImpl implements UsuariDAO {
         try {
             session = FactorySession.openSession();
             usuari = (Usuari) session.get(Usuari.class, usuariID);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // LOG
-        }
-        finally {
+        } finally {
             session.close();
         }
 
         return usuari;
     }
 
-
+/*
     public void updateUsuari(int usuariID, String name, String surname, int salary) {
         Usuari usuari  = this.getUsuari(usuariID);
         usuari.setNom(name);
@@ -83,9 +86,9 @@ public class UsuariDAOImpl implements UsuariDAO {
     }
 
 
-    public List<Object> getUsuaris() {
+    public List<Usuari> getUsuaris() {
         Sessio session = null;
-        List<Object> usuariList=null;
+        List<Usuari> usuariList=null;
         try {
             session = FactorySession.openSession();
             usuariList = session.findAll(Usuari.class);
@@ -123,7 +126,6 @@ public class UsuariDAOImpl implements UsuariDAO {
         return usuariList;
     }
 
-    /*
 
     public void customQuery(xxxx) {
         Session session = null;
@@ -133,7 +135,11 @@ public class UsuariDAOImpl implements UsuariDAO {
             Connection c = session.getConnection();
             c.createStatement("SELECT * ")
 
-        }
-*/
 
+        */
 }
+
+
+
+
+

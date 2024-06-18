@@ -7,10 +7,14 @@ import java.util.List;
 
 public interface UsuariDAO {
 
-    public int addUsuari(String nom, String cognom, String nomusuari, String password, String password2, int coins);
-    public Usuari getUsuari(int usuariID);
-    public void updateUsuari(int usuariID, String name, String surname, int salary);
-    public void deleteUsuari(int usuariID);
-    public List<Object> getUsuaris();
-    public List <Object> getUsuariByDept(int deptId);
+    public void addUsuari(String nom, String cognom, String nomusuari, String password, String password2, int coins);
+
+    public Usuari getUsuari(int employeeID);
 }
+    /*
+    public void updateUsuari(int employeeID, String name, String surname, double salary);
+    public void deleteUsuari(int employeeID);
+
+    public List<Usuari> getUsuaris();
+    public List <Usuari> getUsuariByDept(int deptId);
+*/

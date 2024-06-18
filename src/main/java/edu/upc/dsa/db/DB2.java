@@ -11,7 +11,7 @@ public class DB2 extends DB{
         Connection connection = DBUtils.getConnection();
 
         // SQL INJECTION
-        String theQuery = "INSERT INTO user (id, nom, cognom, nomusuari, password) VALUES (1, ?, ?, ?,?)";
+        String theQuery = "INSERT INTO usuari (id, nom, cognom, nomusuari, password) VALUES (1, ?, ?, ?,?)";
         // log.debug
 
         PreparedStatement statement1  =  connection.prepareStatement(theQuery);
@@ -22,9 +22,7 @@ public class DB2 extends DB{
 
         // a = b / 0  - null.method();
 
-        /// NULLPOINTER ??
         statement1.execute();
-        /// NULLPOINTER ??
 
 
         connection.close();
