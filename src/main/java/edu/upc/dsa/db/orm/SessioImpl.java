@@ -1,10 +1,12 @@
 package edu.upc.dsa.db.orm;
 
+import edu.upc.dsa.models.Usuari;
 import edu.upc.dsa.util.ObjectHelper;
 import edu.upc.dsa.util.QueryHelper;
 
 import java.sql.*;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import java.sql.Connection;
@@ -21,7 +23,7 @@ public class SessioImpl implements Sessio {
 
 
     @Override
-    public void save(Object entity) {
+    public void save(Object entity){
         if (conn == null) {
             throw new IllegalStateException("Connection is not initialized.");
         }
@@ -37,7 +39,6 @@ public class SessioImpl implements Sessio {
             }
 
             pstm.executeUpdate();
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -45,15 +46,52 @@ public class SessioImpl implements Sessio {
 
 
     public void close() {
-
+        try {
+            this.conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public Object get(Class theClass, Object ID) {
-        return null;
+    public Object get(Class theClass, String columna, String value) throws SQLException {
+        String selectQuery  = QueryHelper.createQuerySELECT(theClass, columna, value);
+        ResultSet rs;
+        PreparedStatement pstm = null;
+
+        try {
+            pstm = conn.prepareStatement(selectQuery);
+            pstm.setObject(1, value); //son los ?
+            rs = pstm.executeQuery();
+            Object o = theClass.newInstance();
+
+            if (!rs.next()) {
+                // No records found
+                o = null;
+            } else{
+                ResultSetMetaData rsmd = rs.getMetaData();
+                int numberOfColumns = rsmd.getColumnCount();
+
+                do {
+                    for (int i = 1; i <= numberOfColumns; i++) {
+                        String columnName = rsmd.getColumnName(i);
+                        ObjectHelper.setter(o, columnName, rs.getObject(i));
+                    }
+                } while (rs.next());
+            }
+
+            return o;
+
+        } catch (SQLException e) {
+            throw new SQLException();
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public Object get(Class theClass, int ID) {
+    /*public Object get(Class theClass, int ID) {
 
 //        String sql = QueryHelper.createQuerySELECT(theClass);
 //
@@ -76,7 +114,7 @@ public class SessioImpl implements Sessio {
 //        }
 
         return null;
-    }
+    }*/
 
     public void update(Object object) {
 
@@ -86,12 +124,36 @@ public class SessioImpl implements Sessio {
 
     }
 
-    public List<Object> findAll(Class theClass) {
-        return null;
+    public <T> List<T> findAll(Class theClass) {
+        String query = QueryHelper.createQuerySELECTall(theClass);
+        PreparedStatement pstm =null;
+        ResultSet rs;
+        List<T> list = new LinkedList<>();
+        try {
+            pstm = conn.prepareStatement(query);
+            pstm.executeQuery();
+            rs = pstm.getResultSet();
+
+            ResultSetMetaData metadata = rs.getMetaData();
+            int numberOfColumns = metadata.getColumnCount();
+
+            while (rs.next()){
+                T o = (T) theClass.newInstance();
+                for (int j=1; j<=numberOfColumns; j++){
+                    String columnName = metadata.getColumnName(j);
+                    ObjectHelper.setter(o, columnName, rs.getObject(j));
+                }
+                list.add(o);
+            }
+        } catch (SQLException | InstantiationException | IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
-    public List<Object> findAll(Class theClass, HashMap params) {
-     /*   String theQuery = QueryHelper.createSelectFindAll(theClass, params);
+
+    /*public List<Object> findAll(Class theClass, HashMap params) {
+        String theQuery = QueryHelper.createSelectFindAll(theClass, params);
         PreparedStatement pstm = null;
         pstm = conn.prepareStatement(theQuery);
 
@@ -105,9 +167,9 @@ public class SessioImpl implements Sessio {
 
 
         return result;
-*/
+
      return null;
-    }
+    }*/
 
     public List<Object> query(String query, Class theClass, HashMap params) {
         return null;

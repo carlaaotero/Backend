@@ -1,9 +1,16 @@
 package edu.upc.dsa.db.orm.dao;
 
 import edu.upc.dsa.db.orm.FactorySession;
+import edu.upc.dsa.exception.IncorrectPasswordException;
+import edu.upc.dsa.exception.MissingDataException;
+import edu.upc.dsa.exception.UserAlreadyExistsException;
+import edu.upc.dsa.exception.UserNotFoundException;
 import edu.upc.dsa.models.Usuari;
 import edu.upc.dsa.db.orm.Sessio;
+import edu.upc.dsa.models.UsuariLogin;
 
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -18,18 +25,57 @@ public class UsuariDAOImpl implements UsuariDAO {
     }
 
 
+    public void addUsuari(String nom, String cognom, String nomusuari, String password, String password2, int coins) throws MissingDataException, IncorrectPasswordException, UserAlreadyExistsException {
+        if (nom.isEmpty() || cognom.isEmpty() || nomusuari.isEmpty() || password.isEmpty() || password2.isEmpty()) {
+            throw new MissingDataException("Falten camps per completar");
+        } else if (!password.equals(password2)) {
+            throw new IncorrectPasswordException("La contrasenya no coincideix");
+        }else{
+            Sessio session = null;
+            try {
+                session = FactorySession.openSession();
+                Usuari usuari = new Usuari(nom, cognom, nomusuari, password, password2, coins);
+                session.save(usuari);
+            } catch (SQLIntegrityConstraintViolationException e) {
+                throw new UserAlreadyExistsException("Aquest nom d'usuari ja existeix.");
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (session != null) {
+                    session.close();
+                }
+            }
+        }
+    }
 
-    public void addUsuari(String nom, String cognom, String nomusuari, String password, String password2, int coins) {
+    @Override
+    public UsuariLogin loginUsuari(String nomusuari, String password) throws MissingDataException, UserNotFoundException, IncorrectPasswordException {
+
+        if (nomusuari.isEmpty() || password.isEmpty()){
+            throw new MissingDataException("Falten camps per completar");
+        }
         Sessio session = null;
-        try {
+        Usuari usuari;
+        try{
             session = FactorySession.openSession();
-            Usuari usuari = new Usuari(nom, cognom, nomusuari, password, password2, coins);
-            session.save(usuari);
-        } catch (Exception e) {
-            // LOG
-        } finally {
+            usuari = (Usuari) session.get(Usuari.class, "nomusuari", nomusuari);
+            if(usuari == null){
+                throw new UserNotFoundException("L'usuari no s'ha trobat");
+            }else if(!usuari.getPassword().equals(password)) {
+                throw new IncorrectPasswordException("Usuari o contrasenya equivocada");
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        finally {
+            assert session != null;
             session.close();
         }
+        UsuariLogin credencials = new UsuariLogin();
+        credencials.setNomusuari(nomusuari);
+        credencials.setPassword(password);
+        return credencials;
     }
 
 
@@ -38,7 +84,7 @@ public class UsuariDAOImpl implements UsuariDAO {
         Usuari usuari = null;
         try {
             session = FactorySession.openSession();
-            usuari = (Usuari) session.get(Usuari.class, usuariID);
+            //usuari = (Usuari) session.get(Usuari.class, usuariID);
         } catch (Exception e) {
             // LOG
         } finally {
@@ -46,6 +92,23 @@ public class UsuariDAOImpl implements UsuariDAO {
         }
 
         return usuari;
+    }
+
+    public List<Usuari> llistaUsuarisDAO(){
+        Sessio session = null;
+        List<Usuari> usuaris=null;
+        try {
+            session = FactorySession.openSession();
+            usuaris = session.findAll(Usuari.class);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            assert session != null;
+            session.close();
+        }
+        return usuaris;
     }
 
 /*

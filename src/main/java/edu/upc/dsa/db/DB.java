@@ -8,7 +8,7 @@ public class DB {
 
         Connection connection = DBUtils.getConnection();
         Statement statement1  = connection.createStatement();
-        statement1.execute("INSERT INTO usuari (id, nom, cognom, nomusuari, password) VALUES (0,'nom5', 'cognom1', 'nomusuari1', 'password1')");
+        statement1.execute("INSERT INTO Usuari (id, nom, cognom, nomusuari, password) VALUES (0,'nom5', 'cognom1', 'nomusuari1', 'password1')");
         // i = x / 0
         connection.close();
 
@@ -57,7 +57,7 @@ public class DB {
         try {
             connection = DBUtils.getConnection();
             Statement statement2 = connection.createStatement();
-            ResultSet rs = statement2.executeQuery("SELECT *  FROM usuari WHERE 1=1");
+            ResultSet rs = statement2.executeQuery("SELECT *  FROM Usuari WHERE 1=1");
             // INTROSPECCIÓ BBDD
             ResultSetMetaData rsmd = rs.getMetaData();
             System.out.println("cols "+rsmd.getColumnCount());

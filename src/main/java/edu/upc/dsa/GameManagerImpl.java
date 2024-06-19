@@ -79,6 +79,7 @@ public class GameManagerImpl implements GameManager {
         } else {
             //Si el nombre de usuario no está en uso, registra el usuario
             Usuari usuari = new Usuari(nom, cognom, nomusuari, password, password2, coins);
+            usuari.setCoins(20);
             this.usuaris.add(usuari);
 
             /*try {

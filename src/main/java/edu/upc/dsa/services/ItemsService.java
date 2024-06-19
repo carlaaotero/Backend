@@ -25,12 +25,12 @@ public class ItemsService {
 
     public ItemsService() throws ItemAlreadyExistsException, MissingDataException {
         this.um = GameManagerImpl.getInstance();
-        /*if (um.size()==0) {
+        if (um.size()==0) {
             this.um.addItem("Vermell", 1, "Guanyes una vida", "https://i.pinimg.com/originals/2e/52/ab/2e52ab40fa59208c7f2d9c87f4a0227a.png");
             this.um.addItem("Verd", 2, "Tens més temps", "https://i.pinimg.com/originals/31/65/df/3165dfaa0fac0ca61802f9cdc1aef4d0.png");
             this.um.addItem("Groc", 3, "Obtens una pista", "https://s.namemc.com/3d/skin/body.png?id=6e52bc59debf0ea9&model=classic&width=308&height=308");
             this.um.addItem("Blau", 4, "Recompensa", "https://s.namemc.com/3d/skin/body.png?id=9489e7e4724918e8&model=slim&width=308&height=308");
-        }*/
+        }
     }
 
     @GET

@@ -36,10 +36,10 @@ public class QueryHelper {
     }
 
 
-    public static String createQuerySELECT(Object entity) {
+    public static String createQuerySELECT(Class theClass, String columna, String user) {
         StringBuffer sb = new StringBuffer();
-        sb.append("SELECT * FROM ").append(entity.getClass().getSimpleName());
-        sb.append(" WHERE ID = ?");
+        sb.append("SELECT * FROM ").append(theClass.getSimpleName());
+        sb.append(" WHERE " + columna + " = ?");
 
         return sb.toString();
     }
@@ -54,6 +54,13 @@ public class QueryHelper {
             sb.append(" AND "+key+"=?");
         }
 
+
+        return sb.toString();
+    }
+
+    public static String createQuerySELECTall(Class theClass) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("SELECT * FROM ").append(theClass.getSimpleName());
 
         return sb.toString();
     }
