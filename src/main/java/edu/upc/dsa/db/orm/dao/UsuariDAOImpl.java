@@ -35,6 +35,7 @@ public class UsuariDAOImpl implements UsuariDAO {
             try {
                 session = FactorySession.openSession();
                 Usuari usuari = new Usuari(nom, cognom, nomusuari, password, password2, coins);
+                usuari.setCoins(20);
                 session.save(usuari);
             } catch (SQLIntegrityConstraintViolationException e) {
                 throw new UserAlreadyExistsException("Aquest nom d'usuari ja existeix.");
@@ -78,20 +79,26 @@ public class UsuariDAOImpl implements UsuariDAO {
         return credencials;
     }
 
-
-    public Usuari getUsuari(int usuariID) {
+    @Override
+    public Usuari getUsuari(String nomusuari) throws UserNotFoundException {
         Sessio session = null;
         Usuari usuari = null;
         try {
             session = FactorySession.openSession();
-            //usuari = (Usuari) session.get(Usuari.class, usuariID);
-        } catch (Exception e) {
-            // LOG
-        } finally {
+            usuari = (Usuari) session.get(Usuari.class, "nomusuari", nomusuari);
+            if (usuari == null) {
+                throw new UserNotFoundException("Usuari no trobat.");
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            assert session != null;
             session.close();
         }
-
         return usuari;
+
     }
 
     public List<Usuari> llistaUsuarisDAO(){
